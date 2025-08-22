@@ -14,7 +14,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float knockbackPower;
 
     [Header("References")]
-    [SerializeField] private GameObject goalObj;
+    [SerializeField] private GameObject goalResult;
     [SerializeField] private GameObject player;
     [SerializeField] private CameraController CameraController;
     public Vector3 startPosition;
@@ -143,7 +143,7 @@ public class PlayerController : MonoBehaviour
     private void Goal()
     {
         // ゴールしたときのUIを表示
-        goalObj.SetActive(true);
+        goalResult.SetActive(true);
         // ゲームのアクティブ状態を変更
         GameManager.Instance.isGameActive = false;
         print("goal");

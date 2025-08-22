@@ -3,21 +3,34 @@ using UnityEngine.SceneManagement;
 
 public class SceneLoader : MonoBehaviour
 {
+    public static SceneLoader Instance { get; private set; }
+
     [SerializeField] private GameObject player;
     [SerializeField] private GameObject goalUI;
 
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            //Destroy(gameObject);
+        }
+    }
 
-    public void titleLoad()
+    public void TitleLoad()
     {
         SceneManager.LoadScene("title");
         GameManager.Instance.isGameActive = false;
     }
 
-    public void gameLoad()
+    public void GameLoad()
     {
-        //SceneManager.LoadScene("game");
-        player.transform.position = new Vector3(-7.0f,-3.5f,0.0f);
-        goalUI.SetActive(false);
+        SceneManager.LoadScene("game");
+        print("game");
         GameManager.Instance.isGameActive = true;
     }
 }

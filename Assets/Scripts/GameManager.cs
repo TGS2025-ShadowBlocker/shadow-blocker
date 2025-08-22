@@ -8,7 +8,7 @@ public class GameManager : MonoBehaviour
     // ここにゲーム全体で使う変数やメソッドを定義する
     public bool isGameActive = true;
     public float gameTime = 120f;
-    //public bool isJyamSet = false;
+    public GameObject resultScreen;
 
     private void Awake()
     {
