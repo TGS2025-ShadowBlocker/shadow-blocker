@@ -46,7 +46,6 @@ public class PlayerController : MonoBehaviour
     private void FixedUpdate()
     {
         Movement();
-        print(isGround);
     }
 
     private void Movement()
