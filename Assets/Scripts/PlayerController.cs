@@ -21,6 +21,7 @@ public class PlayerController : MonoBehaviour
 
     [Header("State")]
     private bool isGround = true;
+    private bool hasSpawnedResult = false;
     private bool canKnockback = false;
     private Vector2 moveVelocity;
 
@@ -110,16 +111,14 @@ public class PlayerController : MonoBehaviour
     private void Knockback()
     {
         if (!canKnockback) return;
-        
-        if (Input.GetKey(KeyCode.C))
+        var tracker = GetTrackingDatas.Instance;
+        if (tracker == null) return; // トラッキング用オブジェクトがシーンにない場合は何もしない
+
+        if (tracker.IsKickActive)
         {
             moveVelocity = new Vector2(-1.0f, 1.0f).normalized * knockbackPower;
         }
-        else if (Input.GetKey(KeyCode.R))
-        {
-            moveVelocity = new Vector2(-1.0f, -1.0f).normalized * knockbackPower;
-        }
-        else if (Input.GetKey(KeyCode.F))
+        else if (tracker.IsPunchActive)
         {
             moveVelocity = new Vector2(-1.0f, 0.0f).normalized * knockbackPower;
         }
@@ -137,16 +136,43 @@ public class PlayerController : MonoBehaviour
         GameManager.Instance.isGameActive = false; */
 
         transform.position = startPosition;
-        CameraController.cameraReset();
     }
     
     private void Goal()
     {
-        // ゴールしたときのUIを表示
-        goalResult.SetActive(true);
+        if (hasSpawnedResult) return;
+        hasSpawnedResult = true;
+
+        // ゴールしたときのUIを表示（優先: インスペクタで割り当てた goalResult -> GameManager.resultScreen -> 何もしない）
+        if (goalResult != null)
+        {
+            // goalResult がシーン内の非アクティブなオブジェクトであれば単に有効化
+            goalResult.SetActive(true);
+        }
+        else
+        {
+            GameObject toInstantiate = GameManager.Instance != null ? GameManager.Instance.resultScreen : null;
+            if (toInstantiate != null)
+            {
+                var canvas = FindObjectOfType<Canvas>();
+                if (canvas != null)
+                {
+                    Instantiate(toInstantiate, canvas.transform, false);
+                }
+                else
+                {
+                    Instantiate(toInstantiate, Vector3.zero, Quaternion.identity);
+                }
+            }
+            else
+            {
+                Debug.LogWarning("PlayerController.Goal: No goalResult assigned and GameManager.resultScreen is null. Cannot show result UI.");
+            }
+        }
+
         // ゲームのアクティブ状態を変更
         GameManager.Instance.isGameActive = false;
-        print("goal");
+        Debug.Log("goal");
     }
     
     // y軸の速度がほぼゼロかどうかを判定
