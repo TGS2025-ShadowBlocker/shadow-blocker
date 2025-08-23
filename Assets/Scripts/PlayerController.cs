@@ -97,6 +97,7 @@ public class PlayerController : MonoBehaviour
     {
         if (isGround)
         {
+            AudioManager.Instance.Play("jump"); // ジャンプ音を再生
             rb.AddForce(Vector2.up * jumpPower);
             isGround = false; // 接地判定これだと不具合起きる可能性があるって聞いたんですけどどうなんですかね
             //isGroundってtfしかないし、外でfalseにする理由ねぇかなって。一応言っとくとこれなくすと無限ジャンプ編入る
@@ -135,6 +136,7 @@ public class PlayerController : MonoBehaviour
         // ゲームを非アクティブにする 
         GameManager.Instance.isGameActive = false; */
 
+        AudioManager.Instance.Play("player_death");
         transform.position = startPosition;
     }
     
@@ -142,6 +144,9 @@ public class PlayerController : MonoBehaviour
     {
         if (hasSpawnedResult) return;
         hasSpawnedResult = true;
+        AudioManager.Instance.StopBGM();
+        AudioManager.Instance.Play("result");
+        AudioManager.Instance.Play("gameover");
 
         // ゴールしたときのUIを表示（優先: インスペクタで割り当てた goalResult -> GameManager.resultScreen -> 何もしない）
         if (goalResult != null)

@@ -56,6 +56,9 @@ public class TimerText : MonoBehaviour
             {
                 gameTime = 0f;
                 GameManager.Instance.isGameActive = false;
+                AudioManager.Instance.Play("gameover"); // ゲームオーバー音を再生
+                AudioManager.Instance.StopBGM(); // BGMを停止
+                AudioManager.Instance.Play("result"); // 結果画面のBGMを再生
                 SpawnResultPrefab();
             }
         }

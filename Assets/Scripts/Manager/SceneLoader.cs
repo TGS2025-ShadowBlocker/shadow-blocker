@@ -25,12 +25,13 @@ public class SceneLoader : MonoBehaviour
     {
         SceneManager.LoadScene("title");
         GameManager.Instance.isGameActive = false;
+        AudioManager.Instance.Play("button");
     }
 
     public void GameLoad()
     {
         SceneManager.LoadScene("game");
-        print("game");
         GameManager.Instance.isGameActive = true;
+        AudioManager.Instance.Play("button");
     }
 }
