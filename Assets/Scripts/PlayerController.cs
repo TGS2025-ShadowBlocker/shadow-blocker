@@ -18,11 +18,13 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private GameObject player;
     [SerializeField] private CameraController CameraController;
     public Vector3 startPosition;
+    [SerializeField] private Animator anim;
 
     [Header("State")]
     private bool isGround = true;
     private bool hasSpawnedResult = false;
     private bool canKnockback = false;
+    private bool end_first = true;
     private Vector2 moveVelocity;
 
     private Rigidbody2D rb;
@@ -42,6 +44,7 @@ public class PlayerController : MonoBehaviour
     private void Start()
     {
         transform.position = startPosition;
+        anim = GetComponent<Animator>();
     }
 
     private void FixedUpdate()
@@ -64,11 +67,18 @@ public class PlayerController : MonoBehaviour
 
             // Velocityを適用する
             ApplyMovement(moveVelocity);
+
+        }
+        else if(end_first)
+        {
+            ApplyMovement(Vector2.zero);
+            end_first = false;
         }
 
-        //ゲームが終了した後も殴れるとおもろいので外に出します
-        // ノックバックする
-        Knockback();
+            PlayAnim();
+            //ゲームが終了した後も殴れるとおもろいので外に出します
+            // ノックバックする
+            Knockback();
 
         if (!Input.GetKey(KeyCode.F) && !Input.GetKey(KeyCode.R) && !Input.GetKey(KeyCode.C))
         {
@@ -85,7 +95,7 @@ public class PlayerController : MonoBehaviour
         }
         // 左に移動
         if ((Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow)))
-        {
+        { 
             moveVelocity += Vector2.left * speed;
         }
         // ジャンプ！
@@ -110,7 +120,39 @@ public class PlayerController : MonoBehaviour
     {
         rb.velocity = new Vector2(moveVelocity.x, rb.velocity.y);
     }
-    
+
+    private void PlayAnim()
+    {
+        if (!isGround)
+        {
+            anim.Play("jump");
+        }
+        else
+        {
+            if (moveVelocity.x == 0.0f)
+            {
+                anim.Play("boudati");
+            }
+            else if (moveVelocity.x > 0.0f)
+            {
+                anim.Play("run");
+            }
+            else if (moveVelocity.x < 0.0f)
+            {
+                anim.Play("run");
+            }
+        }
+        if (moveVelocity.x > 0.0f)
+        {
+            transform.localScale = new Vector3(Mathf.Abs(transform.localScale.x), transform.localScale.y, transform.localScale.z);
+        }
+        else if (moveVelocity.x < 0.0f)
+        {
+            transform.localScale = new Vector3(Mathf.Abs(transform.localScale.x) * -1.0f, transform.localScale.y, transform.localScale.z);
+        }
+    }
+
+
     private void Knockback()
     {
         if (!canKnockback) return;
@@ -162,14 +204,16 @@ public class PlayerController : MonoBehaviour
             if (toInstantiate != null)
             {
                 var canvas = FindObjectOfType<Canvas>();
+                GameObject result;
                 if (canvas != null)
                 {
-                    Instantiate(toInstantiate, canvas.transform, false);
+                    result = Instantiate(toInstantiate, canvas.transform, false);
                 }
                 else
                 {
-                    Instantiate(toInstantiate, Vector3.zero, Quaternion.identity);
+                    result = Instantiate(toInstantiate, Vector3.zero, Quaternion.identity);
                 }
+                result.GetComponent<ResultScreen>().player_win();
             }
             else
             {
