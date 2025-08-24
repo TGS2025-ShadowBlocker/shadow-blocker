@@ -17,18 +17,18 @@ public class ImageData
 
 public class PersonSilhouetteReceiver : MonoBehaviour
 {
-    [Header("Ú‘±İ’è")]
+    [Header("æ¥ç¶šè¨­å®š")]
     public string serverIP = "localhost";
     public int serverPort = 12345;
 
-    [Header("•\¦İ’è")]
-    public Renderer targetRenderer;  // ‰æ‘œ‚ğ•\¦‚·‚éƒIƒuƒWƒFƒNƒg‚ÌRenderer
-    public bool autoCreateQuad = true;  // ©“®‚ÅQuad‚ğì¬
-    public float cameraDistance = 10f;  // ƒJƒƒ‰‚©‚ç‚Ì‹——£
-    public bool adjustToScreenSize = true;  // ‰æ–ÊƒTƒCƒY‚É‡‚í‚¹‚Ä’²®
-    public bool stayInFrontOfCamera = true;  // ƒJƒƒ‰‚Ì‘O–Ê‚ÉŒÅ’è
+    [Header("è¡¨ç¤ºè¨­å®š")]
+    public Renderer targetRenderer;  // ç”»åƒã‚’è¡¨ç¤ºã™ã‚‹ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®Renderer
+    public bool autoCreateQuad = true;  // è‡ªå‹•ã§Quadã‚’ä½œæˆ
+    public float cameraDistance = 10f;  // ã‚«ãƒ¡ãƒ©ã‹ã‚‰ã®è·é›¢
+    public bool adjustToScreenSize = true;  // ç”»é¢ã‚µã‚¤ã‚ºã«åˆã‚ã›ã¦èª¿æ•´
+    public bool stayInFrontOfCamera = true;  // ã‚«ãƒ¡ãƒ©ã®å‰é¢ã«å›ºå®š
 
-    [Header("ƒfƒoƒbƒO")]
+    [Header("ãƒ‡ãƒãƒƒã‚°")]
     public bool showDebugInfo = true;
 
     private TcpClient tcpClient;
@@ -37,12 +37,12 @@ public class PersonSilhouetteReceiver : MonoBehaviour
     private bool isConnected = false;
     private bool shouldStop = false;
 
-    // ƒƒCƒ“ƒXƒŒƒbƒh‚ÅXV‚·‚é‚½‚ß‚Ì•Ï”
+    // ãƒ¡ã‚¤ãƒ³ã‚¹ãƒ¬ãƒƒãƒ‰ã§æ›´æ–°ã™ã‚‹ãŸã‚ã®å¤‰æ•°
     private byte[] pendingImageData;
     private bool hasNewImageData = false;
     private readonly object imageLock = new object();
 
-    // ‰æ–ÊƒTƒCƒY’²®—p
+    // ç”»é¢ã‚µã‚¤ã‚ºèª¿æ•´ç”¨
     private GameObject displayQuad;
     private Camera mainCamera;
     private float lastAspect;
@@ -50,19 +50,19 @@ public class PersonSilhouetteReceiver : MonoBehaviour
 
     void Start()
     {
-        // ©“®‚ÅQuad‚ğì¬‚·‚éê‡
+        // è‡ªå‹•ã§Quadã‚’ä½œæˆã™ã‚‹å ´åˆ
         if (autoCreateQuad && targetRenderer == null)
         {
             CreateDisplayQuad();
         }
 
-        // PythonÚ‘±ŠJn
+        // Pythonæ¥ç¶šé–‹å§‹
         ConnectToPython();
     }
 
     void CreateDisplayQuad()
     {
-        // ƒJƒƒ‰‚ğæ“¾
+        // ã‚«ãƒ¡ãƒ©ã‚’å–å¾—
         mainCamera = Camera.main;
         if (mainCamera == null)
         {
@@ -71,58 +71,58 @@ public class PersonSilhouetteReceiver : MonoBehaviour
 
         if (mainCamera == null)
         {
-            Debug.LogError("ƒJƒƒ‰‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñ‚Å‚µ‚½");
+            Debug.LogError("ã‚«ãƒ¡ãƒ©ãŒè¦‹ã¤ã‹ã‚Šã¾ã›ã‚“ã§ã—ãŸ");
             return;
         }
 
-        // QuadƒIƒuƒWƒFƒNƒg‚ğì¬
+        // Quadã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ä½œæˆ
         displayQuad = GameObject.CreatePrimitive(PrimitiveType.Quad);
         displayQuad.name = "PersonSilhouetteDisplay";
 
-        // Renderer‚ğæ“¾
+        // Rendererã‚’å–å¾—
         targetRenderer = displayQuad.GetComponent<Renderer>();
 
-        // ”wŒi“§–¾‘Î‰‚ÌƒVƒF[ƒ_[‚ğİ’è
+        // èƒŒæ™¯é€æ˜å¯¾å¿œã®ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ã‚’è¨­å®š
         targetRenderer.material = new Material(Shader.Find("Sprites/Default"));
 
-        // ƒŒƒ“ƒ_[ƒI[ƒ_[‚ğİ’è‚µ‚ÄÅ‘O–Ê‚É•\¦
+        // ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚ªãƒ¼ãƒ€ãƒ¼ã‚’è¨­å®šã—ã¦æœ€å‰é¢ã«è¡¨ç¤º
         targetRenderer.material.renderQueue = 3000;
 
-        // ‰ŠúƒTƒCƒY‚Æƒ|ƒWƒVƒ‡ƒ“‚ğİ’è
+        // åˆæœŸã‚µã‚¤ã‚ºã¨ãƒã‚¸ã‚·ãƒ§ãƒ³ã‚’è¨­å®š
         UpdateQuadTransform();
 
         if (showDebugInfo)
-            Debug.Log($"•\¦—pQuad‚ğì¬‚µ‚Ü‚µ‚½");
+            Debug.Log($"è¡¨ç¤ºç”¨Quadã‚’ä½œæˆã—ã¾ã—ãŸ");
     }
 
     void UpdateQuadTransform()
     {
         if (displayQuad == null || mainCamera == null) return;
 
-        // ƒJƒƒ‰‚Ì‘O–Ê‚É”z’u
+        // ã‚«ãƒ¡ãƒ©ã®å‰é¢ã«é…ç½®
         if (stayInFrontOfCamera)
         {
             displayQuad.transform.position = mainCamera.transform.position + mainCamera.transform.forward * cameraDistance;
             displayQuad.transform.rotation = mainCamera.transform.rotation;
         }
 
-        // ‰æ–Ê‘S‘Ì‚ğƒJƒo[‚·‚éƒTƒCƒY‚ğŒvZ
+        // ç”»é¢å…¨ä½“ã‚’ã‚«ãƒãƒ¼ã™ã‚‹ã‚µã‚¤ã‚ºã‚’è¨ˆç®—
         if (adjustToScreenSize)
         {
-            // ƒJƒƒ‰‚Ì‹–ìŠp‚ÆƒAƒXƒyƒNƒg”ä‚©‚ç“KØ‚ÈƒTƒCƒY‚ğŒvZ
+            // ã‚«ãƒ¡ãƒ©ã®è¦–é‡è§’ã¨ã‚¢ã‚¹ãƒšã‚¯ãƒˆæ¯”ã‹ã‚‰é©åˆ‡ãªã‚µã‚¤ã‚ºã‚’è¨ˆç®—
             float cameraHeight = 2.0f * Mathf.Tan(mainCamera.fieldOfView * 0.5f * Mathf.Deg2Rad) * cameraDistance;
             float cameraWidth = cameraHeight * mainCamera.aspect;
 
-            // Quad‚ÌƒTƒCƒY‚ğİ’èi‰æ–Ê‘S‘Ì‚ğƒJƒo[j
+            // Quadã®ã‚µã‚¤ã‚ºã‚’è¨­å®šï¼ˆç”»é¢å…¨ä½“ã‚’ã‚«ãƒãƒ¼ï¼‰
             displayQuad.transform.localScale = new Vector3(cameraWidth * 2.0f, cameraHeight * 2.0f, 1.0f);
             displayQuad.transform.position = new Vector3(4.5f, 0f, 0f);
 
-            // Œ»İ‚Ì’l‚ğ•Û‘¶
+            // ç¾åœ¨ã®å€¤ã‚’ä¿å­˜
             lastAspect = mainCamera.aspect;
             lastFOV = mainCamera.fieldOfView;
 
             if (showDebugInfo)
-                Debug.Log($"QuadƒTƒCƒYXV: {cameraWidth:F2} x {cameraHeight:F2} (ƒAƒXƒyƒNƒg”ä: {mainCamera.aspect:F2})");
+                Debug.Log($"Quadã‚µã‚¤ã‚ºæ›´æ–°: {cameraWidth:F2} x {cameraHeight:F2} (ã‚¢ã‚¹ãƒšã‚¯ãƒˆæ¯”: {mainCamera.aspect:F2})");
         }
     }
 
@@ -135,23 +135,23 @@ public class PersonSilhouetteReceiver : MonoBehaviour
             stream = tcpClient.GetStream();
             isConnected = true;
 
-            // óMƒXƒŒƒbƒh‚ğŠJn
+            // å—ä¿¡ã‚¹ãƒ¬ãƒƒãƒ‰ã‚’é–‹å§‹
             receiveThread = new Thread(ReceiveData);
             receiveThread.Start();
 
             if (showDebugInfo)
-                Debug.Log("PythonÚ‘±¬Œ÷");
+                Debug.Log("Pythonæ¥ç¶šæˆåŠŸ");
         }
         catch (Exception e)
         {
-            Debug.LogError($"PythonÚ‘±¸”s: {e.Message}");
+            Debug.LogError($"Pythonæ¥ç¶šå¤±æ•—: {e.Message}");
             isConnected = false;
         }
     }
 
     void ReceiveData()
     {
-        byte[] buffer = new byte[1024 * 1024 * 4]; // 4MB ƒoƒbƒtƒ@
+        byte[] buffer = new byte[1024 * 1024 * 4]; // 4MB ãƒãƒƒãƒ•ã‚¡
         StringBuilder messageBuilder = new StringBuilder();
 
         while (isConnected && !shouldStop)
@@ -166,18 +166,18 @@ public class PersonSilhouetteReceiver : MonoBehaviour
                         string receivedData = Encoding.UTF8.GetString(buffer, 0, bytesRead);
                         messageBuilder.Append(receivedData);
 
-                        // ‰üs‚Å‹æØ‚ç‚ê‚½ƒƒbƒZ[ƒW‚ğˆ—
+                        // æ”¹è¡Œã§åŒºåˆ‡ã‚‰ã‚ŒãŸãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’å‡¦ç†
                         string allMessages = messageBuilder.ToString();
                         string[] messages = allMessages.Split('\n');
 
-                        // ÅŒã‚ÌƒƒbƒZ[ƒW‚Í•sŠ®‘S‚È‰Â”\«‚ª‚ ‚é‚Ì‚Å•Û
+                        // æœ€å¾Œã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã¯ä¸å®Œå…¨ãªå¯èƒ½æ€§ãŒã‚ã‚‹ã®ã§ä¿æŒ
                         messageBuilder.Clear();
                         if (messages.Length > 0 && !allMessages.EndsWith("\n"))
                         {
                             messageBuilder.Append(messages[messages.Length - 1]);
                         }
 
-                        // Š®‘S‚ÈƒƒbƒZ[ƒW‚ğˆ—
+                        // å®Œå…¨ãªãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’å‡¦ç†
                         int endIndex = allMessages.EndsWith("\n") ? messages.Length : messages.Length - 1;
                         for (int i = 0; i < endIndex; i++)
                         {
@@ -190,12 +190,12 @@ public class PersonSilhouetteReceiver : MonoBehaviour
                 }
                 else
                 {
-                    Thread.Sleep(10); // CPUg—p—¦‚ğ—}§
+                    Thread.Sleep(10); // CPUä½¿ç”¨ç‡ã‚’æŠ‘åˆ¶
                 }
             }
             catch (Exception e)
             {
-                Debug.LogError($"ƒf[ƒ^óMƒGƒ‰[: {e.Message}");
+                Debug.LogError($"ãƒ‡ãƒ¼ã‚¿å—ä¿¡ã‚¨ãƒ©ãƒ¼: {e.Message}");
                 break;
             }
         }
@@ -209,10 +209,10 @@ public class PersonSilhouetteReceiver : MonoBehaviour
 
             if (imageData.type == "image")
             {
-                // Base64‚ğ‰æ‘œƒoƒCƒg”z—ñ‚É•ÏŠ·iƒoƒbƒNƒOƒ‰ƒEƒ“ƒhƒXƒŒƒbƒh‚ÅÀs‰Â”\j
+                // Base64ã‚’ç”»åƒãƒã‚¤ãƒˆé…åˆ—ã«å¤‰æ›ï¼ˆãƒãƒƒã‚¯ã‚°ãƒ©ã‚¦ãƒ³ãƒ‰ã‚¹ãƒ¬ãƒƒãƒ‰ã§å®Ÿè¡Œå¯èƒ½ï¼‰
                 byte[] imageBytes = Convert.FromBase64String(imageData.data);
 
-                // ƒƒCƒ“ƒXƒŒƒbƒh‚Åˆ—‚·‚é‚½‚ß‚Éƒf[ƒ^‚ğ•Û‘¶
+                // ãƒ¡ã‚¤ãƒ³ã‚¹ãƒ¬ãƒƒãƒ‰ã§å‡¦ç†ã™ã‚‹ãŸã‚ã«ãƒ‡ãƒ¼ã‚¿ã‚’ä¿å­˜
                 lock (imageLock)
                 {
                     pendingImageData = imageBytes;
@@ -220,21 +220,21 @@ public class PersonSilhouetteReceiver : MonoBehaviour
                 }
 
                 if (showDebugInfo)
-                    Debug.Log($"‰æ‘œóM: {imageBytes.Length} bytes");
+                    Debug.Log($"ç”»åƒå—ä¿¡: {imageBytes.Length} bytes");
             }
         }
         catch (Exception e)
         {
-            Debug.LogError($"ƒƒbƒZ[ƒWˆ—ƒGƒ‰[: {e.Message}");
+            Debug.LogError($"ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸å‡¦ç†ã‚¨ãƒ©ãƒ¼: {e.Message}");
         }
     }
 
     void Update()
     {
-        // ƒJƒƒ‰İ’è‚ª•ÏX‚³‚ê‚½ê‡AQuad‚ÌƒTƒCƒY‚ğXV
+        // ã‚«ãƒ¡ãƒ©è¨­å®šãŒå¤‰æ›´ã•ã‚ŒãŸå ´åˆã€Quadã®ã‚µã‚¤ã‚ºã‚’æ›´æ–°
         if (adjustToScreenSize && mainCamera != null && displayQuad != null)
         {
-            // ƒAƒXƒyƒNƒg”ä‚â‹–ìŠp‚Ì•ÏX‚ğŒŸo
+            // ã‚¢ã‚¹ãƒšã‚¯ãƒˆæ¯”ã‚„è¦–é‡è§’ã®å¤‰æ›´ã‚’æ¤œå‡º
             if (Mathf.Abs(mainCamera.aspect - lastAspect) > 0.001f ||
                 Mathf.Abs(mainCamera.fieldOfView - lastFOV) > 0.1f)
             {
@@ -242,40 +242,40 @@ public class PersonSilhouetteReceiver : MonoBehaviour
             }
         }
 
-        // ƒƒCƒ“ƒXƒŒƒbƒh‚Å‰æ‘œ‚ğXV
+        // ãƒ¡ã‚¤ãƒ³ã‚¹ãƒ¬ãƒƒãƒ‰ã§ç”»åƒã‚’æ›´æ–°
         if (hasNewImageData && targetRenderer != null)
         {
             lock (imageLock)
             {
                 if (pendingImageData != null)
                 {
-                    // Šù‘¶‚ÌƒeƒNƒXƒ`ƒƒ‚ğ”jŠü
+                    // æ—¢å­˜ã®ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’ç ´æ£„
                     if (targetRenderer.material.mainTexture != null)
                     {
                         DestroyImmediate(targetRenderer.material.mainTexture);
                     }
 
-                    // V‚µ‚¢ƒeƒNƒXƒ`ƒƒ‚ğì¬iƒƒCƒ“ƒXƒŒƒbƒh‚ÅÀsj
+                    // æ–°ã—ã„ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’ä½œæˆï¼ˆãƒ¡ã‚¤ãƒ³ã‚¹ãƒ¬ãƒƒãƒ‰ã§å®Ÿè¡Œï¼‰
                     Texture2D newTexture = new Texture2D(2, 2);
                     newTexture.LoadImage(pendingImageData);
 
-                    // ƒeƒNƒXƒ`ƒƒ‚ğ“K—p
+                    // ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’é©ç”¨
                     targetRenderer.material.mainTexture = newTexture;
 
-                    // ƒtƒ‰ƒO‚ğƒŠƒZƒbƒg
+                    // ãƒ•ãƒ©ã‚°ã‚’ãƒªã‚»ãƒƒãƒˆ
                     hasNewImageData = false;
                     pendingImageData = null;
                 }
             }
         }
 
-        // R ƒL[‚ÅÄÚ‘±
+        // R ã‚­ãƒ¼ã§å†æ¥ç¶š
         if (Input.GetKeyDown(KeyCode.R))
         {
             ReconnectToPython();
         }
 
-        // U ƒL[‚ÅQuadƒTƒCƒY‚ğè“®XV
+        // U ã‚­ãƒ¼ã§Quadã‚µã‚¤ã‚ºã‚’æ‰‹å‹•æ›´æ–°
         if (Input.GetKeyDown(KeyCode.U))
         {
             UpdateQuadTransform();
@@ -295,7 +295,7 @@ public class PersonSilhouetteReceiver : MonoBehaviour
 
         if (receiveThread != null && receiveThread.IsAlive)
         {
-            receiveThread.Join(1000); // 1•b‘Ò‹@
+            receiveThread.Join(1000); // 1ç§’å¾…æ©Ÿ
         }
 
         if (stream != null)
@@ -309,14 +309,14 @@ public class PersonSilhouetteReceiver : MonoBehaviour
         }
 
         if (showDebugInfo)
-            Debug.Log("PythonÚ‘±‚ğØ’f‚µ‚Ü‚µ‚½");
+            Debug.Log("Pythonæ¥ç¶šã‚’åˆ‡æ–­ã—ã¾ã—ãŸ");
     }
 
     void OnDestroy()
     {
         DisconnectFromPython();
 
-        // ƒeƒNƒXƒ`ƒƒ‚ğƒNƒŠ[ƒ“ƒAƒbƒv
+        // ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’ã‚¯ãƒªãƒ¼ãƒ³ã‚¢ãƒƒãƒ—
         if (targetRenderer != null && targetRenderer.material.mainTexture != null)
         {
             DestroyImmediate(targetRenderer.material.mainTexture);
