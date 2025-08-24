@@ -18,6 +18,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private GameObject player;
     [SerializeField] private CameraController CameraController;
     public Vector3 startPosition;
+    [SerializeField] private Animator anim;
 
     [Header("State")]
     private bool isGround = true;
@@ -42,6 +43,7 @@ public class PlayerController : MonoBehaviour
     private void Start()
     {
         transform.position = startPosition;
+        anim = GetComponent<Animator>();
     }
 
     private void FixedUpdate()
@@ -62,6 +64,7 @@ public class PlayerController : MonoBehaviour
 
             // Velocityを適用する
             ApplyMovement(moveVelocity);
+
         }
 
         //ゲームが終了した後も殴れるとおもろいので外に出します
@@ -83,8 +86,35 @@ public class PlayerController : MonoBehaviour
         }
         // 左に移動
         if ((Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow)))
-        {
+        { 
             moveVelocity += Vector2.left * speed;
+        }
+        if (!isGround)
+        {
+            anim.Play("jump");
+        }
+        else
+        {
+            if (moveVelocity.x == 0.0f)
+            {
+                anim.Play("boudati");
+            }
+            else if (moveVelocity.x > 0.0f)
+            {
+                anim.Play("run");
+            }
+            else if (moveVelocity.x < 0.0f)
+            {
+                anim.Play("run");
+            }
+        }
+        if(moveVelocity.x > 0.0f)
+        {
+            transform.localScale = new Vector3(Mathf.Abs(transform.localScale.x), transform.localScale.y, transform.localScale.z);
+        }
+        else if(moveVelocity.x < 0.0f)
+        {
+            transform.localScale = new Vector3(Mathf.Abs(transform.localScale.x) * -1.0f, transform.localScale.y, transform.localScale.z);
         }
         // ジャンプ！
         if (Input.GetKey(KeyCode.Space))
