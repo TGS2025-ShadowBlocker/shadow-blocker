@@ -46,6 +46,8 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if(!GameManager.Instance.isGameActive) return;
+
         Movement();
     }
 
@@ -189,6 +191,8 @@ public class PlayerController : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
+        if(!GameManager.Instance.isGameActive) return;
+
         string collisionTag = collision.gameObject.tag;
         if(collisionTag == GROUND_TAG && IsVerticalVelocityZero())
         {
@@ -208,6 +212,8 @@ public class PlayerController : MonoBehaviour
 
     private void OnCollisionExit2D(Collision2D collision)
     {
+        if(!GameManager.Instance.isGameActive) return;
+
         string collisionTag = collision.gameObject.tag;
         if(collisionTag == GROUND_TAG)
         {
