@@ -90,15 +90,17 @@ public class TimerText : MonoBehaviour
             }
         }
 
+        GameObject result;
         if (parentTransform != null)
         {
             // UI プレハブを Canvas の下に配置する場合は instantiateInWorldSpace=false を使ってローカル transform を維持する
-            Instantiate(toInstantiate, parentTransform, false);
+            result = Instantiate(toInstantiate, parentTransform, false);
         }
         else
         {
             // 親が見つからない場合はワールド原点に生成
-            Instantiate(toInstantiate, Vector3.zero, Quaternion.identity);
+            result = Instantiate(toInstantiate, Vector3.zero, Quaternion.identity);
         }
+        result.GetComponent<ResultScreen>().shadow_win();
     }
 }
