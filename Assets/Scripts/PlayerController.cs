@@ -52,7 +52,6 @@ public class PlayerController : MonoBehaviour
     private void FixedUpdate()
     {
         Movement();
-        Debug.Log(Input.GetAxis("Vertical"));
     }
 
     private void Movement()
@@ -72,6 +71,7 @@ public class PlayerController : MonoBehaviour
         }
         else if(end_first)
         {
+            //ゲーム終了後最初の1フレームは速度を0にする
             ApplyMovement(Vector2.zero);
             end_first = false;
         }
@@ -89,25 +89,11 @@ public class PlayerController : MonoBehaviour
     
     private void BasicMovement()
     {
-        // 右に移動する
-        if ((Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow)))
-        {
-            moveVelocity += Vector2.right * speed;
-        }
-        // 左に移動
-        if ((Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow)))
-        { 
-            moveVelocity += Vector2.left * speed;
-        }
+        moveVelocity += Vector2.right * speed * Input.GetAxisRaw("Horizontal");
         // ジャンプ！
-        if (Input.GetKey(KeyCode.Space) || Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.JoystickButton0) || Input.GetKey(KeyCode.JoystickButton1) || Input.GetAxis("Vertical") > 0.99f)
+        if (Input.GetKey(KeyCode.Space) || Input.GetKey(KeyCode.JoystickButton0) || Input.GetKey(KeyCode.JoystickButton1) || Input.GetAxisRaw("Vertical") > 0.99f)
         {
             Jump();
-        }
-        if(!(Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow)) && !(Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow)))
-        {
-            moveVelocity += Vector2.right * speed * Input.GetAxis("Horizontal");
-            //moveVelocity += Vector2.right * speed * Input.GetKey(KeyCode.);
         }
     }
 
