@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 /***********************
 
 なんで変数名を何でもかんでも略そうとするの？
@@ -19,6 +20,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private CameraController CameraController;
     public Vector3 startPosition;
     [SerializeField] private Animator anim;
+    private Gamepad gamepad;
 
     [Header("State")]
     private bool isGround = true;
@@ -35,7 +37,7 @@ public class PlayerController : MonoBehaviour
     private const string GROUND_TAG = "ground";
     private const string GOAL_TAG = "goal";
     private const string DEATH_TAG = "death";
-    
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -50,6 +52,7 @@ public class PlayerController : MonoBehaviour
     private void FixedUpdate()
     {
         Movement();
+        Debug.Log(Input.GetAxis("Vertical"));
     }
 
     private void Movement()
@@ -97,9 +100,14 @@ public class PlayerController : MonoBehaviour
             moveVelocity += Vector2.left * speed;
         }
         // ジャンプ！
-        if (Input.GetKey(KeyCode.Space))
+        if (Input.GetKey(KeyCode.Space) || Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.JoystickButton0) || Input.GetKey(KeyCode.JoystickButton1) || Input.GetAxis("Vertical") > 0.99f)
         {
             Jump();
+        }
+        if(!(Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow)) && !(Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow)))
+        {
+            moveVelocity += Vector2.right * speed * Input.GetAxis("Horizontal");
+            //moveVelocity += Vector2.right * speed * Input.GetKey(KeyCode.);
         }
     }
 
@@ -237,6 +245,7 @@ public class PlayerController : MonoBehaviour
         if(collisionTag == GROUND_TAG && IsVerticalVelocityZero())
         {
             isGround = true;
+            anim.Play("boudati");
         }
         if (collisionTag == GOAL_TAG)
         {

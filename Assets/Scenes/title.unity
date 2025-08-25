@@ -618,7 +618,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isGameActive: 1
-  gameTime: 3
+  gameTime: 120
   resultScreen: {fileID: 3610451763986598020, guid: b105938fd99c2f84488e64b749cace76, type: 3}
 --- !u!4 &1161424884
 Transform:
