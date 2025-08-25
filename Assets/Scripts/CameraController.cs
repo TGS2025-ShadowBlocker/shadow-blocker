@@ -3,12 +3,20 @@ using UnityEngine;
 public class CameraController : MonoBehaviour
 {
     [SerializeField] private GameObject player;
+    [SerializeField] private GameObject[] goals;
     [SerializeField] private GameObject goal;
     [SerializeField] private float camearaStart;
     [SerializeField] private float magnification;
 
     void Update()
     {
+        foreach(GameObject g in goals)
+        {
+            if(g.activeInHierarchy)
+            {
+                goal = g;
+            }
+        }
         //Ç±Ç±ÇÃêßå‰ÇÕå„ÅX
         if (player.GetComponent<PlayerController>() != null)
         {
