@@ -9,6 +9,8 @@ public class GameManager : MonoBehaviour
     public bool isGameActive = true;
     public float gameTime = 120f;
     public GameObject resultScreen;
+    public int playerScore;
+    public int shadowScore;
 
     private void Awake()
     {

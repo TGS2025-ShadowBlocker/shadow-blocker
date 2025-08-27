@@ -157,10 +157,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 2031791282}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -128}
-  m_SizeDelta: {x: -665.2, y: -434}
+  m_AnchorMin: {x: 0.5, y: 0}
+  m_AnchorMax: {x: 0.5, y: 0}
+  m_AnchoredPosition: {x: 0, y: 104}
+  m_SizeDelta: {x: 160.79999, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &337678607
 MonoBehaviour:
@@ -182,7 +182,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: PRESS ANY BUTTON
+  m_text: "PRESS ANY \nBUTTON"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 94ee147c031dac64b9087cb80b063aaa, type: 2}
   m_sharedMaterial: {fileID: -6766114479442911710, guid: 94ee147c031dac64b9087cb80b063aaa, type: 2}
@@ -783,8 +783,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isGameActive: 1
-  gameTime: 10
+  gameTime: 60
   resultScreen: {fileID: 3610451763986598020, guid: b105938fd99c2f84488e64b749cace76, type: 3}
+  playerScore: 0
+  shadowScore: 0
 --- !u!4 &1161424884
 Transform:
   m_ObjectHideFlags: 0

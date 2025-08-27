@@ -129,12 +129,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 5
   jumpPower: 100
-  knockbackPower: 10
+  kickknockbackPower: 200
+  punchknockbackPower: 500
   goalResult: {fileID: 0}
   player: {fileID: 4413641810000371153}
   CameraController: {fileID: 0}
   startPosition: {x: -7, y: -3.5, z: 0}
   anim: {fileID: 5799862422976014112}
+  ScoreCounter: {fileID: 0}
 --- !u!61 &568961805302425224
 BoxCollider2D:
   m_ObjectHideFlags: 0

@@ -12,7 +12,8 @@ public class PlayerController : MonoBehaviour
     [Header("Movement Settings")]
     [SerializeField] private float speed;
     [SerializeField] private float jumpPower;
-    [SerializeField] private float knockbackPower;
+    [SerializeField] private float kickknockbackPower;
+    [SerializeField] private float punchknockbackPower;
 
     [Header("References")]
     [SerializeField] private GameObject goalResult;
@@ -28,6 +29,9 @@ public class PlayerController : MonoBehaviour
     private bool canKnockback = false;
     private bool end_first = true;
     private Vector2 moveVelocity;
+    private bool kickActiveTime = true;
+    private bool punchActiveTime = true;
+    private bool knockback = false;
 
     private Rigidbody2D rb;
 
@@ -47,6 +51,8 @@ public class PlayerController : MonoBehaviour
     {
         transform.position = startPosition;
         anim = GetComponent<Animator>();
+        Invoke("kickTrue", 1.5f);
+        Invoke("punchTrue", 1.5f);
     }
 
     private void FixedUpdate()
@@ -115,7 +121,11 @@ public class PlayerController : MonoBehaviour
 
     private void PlayAnim()
     {
-        if (!isGround)
+        if(knockback)
+        {
+            anim.Play("knokback");
+        }
+        else if (!isGround)
         {
             anim.Play("jump");
         }
@@ -145,22 +155,44 @@ public class PlayerController : MonoBehaviour
     }
 
 
+    private void kickTrue()
+    {
+        kickActiveTime = true;
+    }
+    private void punchTrue()
+    {
+        punchActiveTime = true;
+    }
+    private void knokbackFalse()
+    {
+        knockback = false;
+    }
     private void Knockback()
     {
+        Vector2 knokback = Vector2.zero;
         if (!canKnockback) return;
         var tracker = GetTrackingDatas.Instance;
         if (tracker == null) return; // トラッキング用オブジェクトがシーンにない場合は何もしない
 
-        if (tracker.IsKickActive)
+        if (tracker.IsKickActive && kickActiveTime)
         {
-            moveVelocity = new Vector2(-1.0f, 1.0f).normalized * knockbackPower;
+            knokback = new Vector2(-1.0f, 1.0f).normalized * kickknockbackPower;
+            kickActiveTime = false;
+            Invoke("kickTrue",1.5f);
+            ScoreCounter.Attack();
+            knockback = true;
+            Invoke("knokbackFalse", 0.2f);
         }
-        else if (tracker.IsPunchActive)
+        else if (tracker.IsPunchActive && punchActiveTime)
         {
-            moveVelocity = new Vector2(-1.0f, 0.0f).normalized * knockbackPower;
+            knokback = new Vector2(-1.0f, 1.0f / 200.0f).normalized * punchknockbackPower;
+            punchActiveTime = false;
+            Invoke("punchTrue",1.5f);
+            ScoreCounter.Attack();
+            knockback = true;
+            Invoke("knokbackFalse", 0.2f);
         }
-
-        rb.AddForce(moveVelocity);
+        rb.AddForce(knokback);
     }
     
     private void Death()
@@ -175,6 +207,7 @@ public class PlayerController : MonoBehaviour
         AudioManager.Instance.Play("player_death");
         transform.position = startPosition;
         ScoreCounter.playerDeath();
+        CameraController.cameraReset();
     }
     
     private void Goal()
