@@ -780,6 +780,53 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 728199667617487196, guid: 6c20b679d91453747abb16242d9672d0, type: 3}
   m_PrefabInstance: {fileID: 323638295}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &342215506
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 342215508}
+  - component: {fileID: 342215507}
+  m_Layer: 0
+  m_Name: ScoreCounter
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &342215507
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 342215506}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 264b89f936780a743931b233144ab6ed, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  result: {fileID: 3610451763986598020, guid: b105938fd99c2f84488e64b749cace76, type: 3}
+  Timer: {fileID: 3156150}
+  base_score: 10000
+--- !u!4 &342215508
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 342215506}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.6421785, y: 1.4465, z: 74.59442}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &353836572
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2875,7 +2922,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1397639229
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3282,7 +3329,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1590578803
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4141,6 +4188,10 @@ PrefabInstance:
       propertyPath: goalResult
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 3100778806214109992, guid: d8002dcc47a6c474baf1447d820b20da, type: 3}
+      propertyPath: ScoreCounter
+      value: 
+      objectReference: {fileID: 342215507}
     - target: {fileID: 3100778806214109992, guid: d8002dcc47a6c474baf1447d820b20da, type: 3}
       propertyPath: CameraController
       value: 
@@ -5024,6 +5075,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: death
       objectReference: {fileID: 0}
+    - target: {fileID: 3598588630793349825, guid: 063aa69ea6bd04e479209fdf4fd8976e, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4979325537471640862, guid: 063aa69ea6bd04e479209fdf4fd8976e, type: 3}
       propertyPath: m_Name
       value: 'Text '
@@ -5148,3 +5203,4 @@ SceneRoots:
   - {fileID: 1590578804}
   - {fileID: 1397639230}
   - {fileID: 2100396911}
+  - {fileID: 342215508}

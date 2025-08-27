@@ -64,7 +64,7 @@ public class CameraController : MonoBehaviour
     }
     void Awake()
     {
-        DontDestroyOnLoad(this.gameObject); // Agent ‚â Camera ‚É•t‚¯‚é
+        //DontDestroyOnLoad(this.gameObject); // Agent ‚â Camera ‚É•t‚¯‚é
     }
 
     public void cameraReset()
