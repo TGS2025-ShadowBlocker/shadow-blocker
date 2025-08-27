@@ -20,7 +20,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private CameraController CameraController;
     public Vector3 startPosition;
     [SerializeField] private Animator anim;
-    private Gamepad gamepad;
+    [SerializeField] private ScoreCounter ScoreCounter;
 
     [Header("State")]
     private bool isGround = true;
@@ -174,6 +174,7 @@ public class PlayerController : MonoBehaviour
 
         AudioManager.Instance.Play("player_death");
         transform.position = startPosition;
+        ScoreCounter.playerDeath();
     }
     
     private void Goal()
@@ -183,6 +184,7 @@ public class PlayerController : MonoBehaviour
         AudioManager.Instance.StopBGM();
         AudioManager.Instance.Play("result");
         AudioManager.Instance.Play("gameover");
+        ScoreCounter.playerGoal();
 
         // ゴールしたときのUIを表示（優先: インスペクタで割り当てた goalResult -> GameManager.resultScreen -> 何もしない）
         if (goalResult != null)
