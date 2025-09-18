@@ -16,6 +16,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float punchknockbackPower;
     [SerializeField] private float punch_cooldown;
     [SerializeField] private float kick_cooldown;
+    [SerializeField] private float punch_range;
+    [SerializeField] private float kick_range;
 
     [Header("References")]
     [SerializeField] private GameObject goalResult;
@@ -43,6 +45,7 @@ public class PlayerController : MonoBehaviour
     private const string GROUND_TAG = "ground";
     private const string GOAL_TAG = "goal";
     private const string DEATH_TAG = "death";
+    [SerializeField] private Camera mainCamera; 
 
     private void Awake()
     {
@@ -169,14 +172,22 @@ public class PlayerController : MonoBehaviour
     {
         knockback = false;
     }
+    private float PointDistance(LandmarkPoint land_p)
+    {
+        Vector3 World_land_point = mainCamera.ViewportToWorldPoint(new Vector3(land_p.x, land_p.y, 0.0f));
+        float value = (World_land_point.x - transform.position.x) * (World_land_point.x - transform.position.x) +
+                      (World_land_point.y - transform.position.y) * (World_land_point.y - transform.position.y);
+        value = Mathf.Sqrt(value);
+        return value;
+    }
     private void Knockback()
     {
         Vector2 knokback = Vector2.zero;
         if (!canKnockback) return;
         var tracker = GetTrackingDatas.Instance;
         if (tracker == null) return; // トラッキング用オブジェクトがシーンにない場合は何もしない
-
-        if (tracker.IsKickActive && kickActiveTime)
+        //左手もしくは右手の近くにplayerがいる
+        if ((tracker.IsKickActive && kickActiveTime) && (PointDistance(tracker.landmarks.left_ankle) < kick_range || PointDistance(tracker.landmarks.right_ankle) < kick_range))
         {
             knokback = new Vector2(-1.0f, 1.0f).normalized * kickknockbackPower;
             kickActiveTime = false;
@@ -185,7 +196,7 @@ public class PlayerController : MonoBehaviour
             knockback = true;
             Invoke("knokbackFalse", 0.2f);
         }
-        else if (tracker.IsPunchActive && punchActiveTime)
+        else if ((tracker.IsPunchActive && punchActiveTime) && (PointDistance(tracker.landmarks.left_wrist) < punch_range || PointDistance(tracker.landmarks.right_wrist) < punch_range))
         {
             knokback = new Vector2(-1.0f, 1.0f / 200.0f).normalized * punchknockbackPower;
             punchActiveTime = false;
