@@ -110,12 +110,13 @@ public class PersonSilhouetteReceiver : MonoBehaviour
         if (adjustToScreenSize)
         {
             // カメラの視野角とアスペクト比から適切なサイズを計算
-            float cameraHeight = 2.0f * Mathf.Tan(mainCamera.fieldOfView * 0.5f * Mathf.Deg2Rad) * cameraDistance;
+            //float cameraHeight = 2.0f * Mathf.Tan(mainCamera.fieldOfView * 0.5f * Mathf.Deg2Rad) * cameraDistance;
+            float cameraHeight = mainCamera.orthographicSize * 2.0f;
             float cameraWidth = cameraHeight * mainCamera.aspect;
 
             // Quadのサイズを設定（画面全体をカバー）
-            displayQuad.transform.localScale = new Vector3(cameraWidth * 2.0f, cameraHeight * 2.0f, 1.0f);
-            displayQuad.transform.position = new Vector3(4.5f, 0f, 0f);
+            displayQuad.transform.localScale = new Vector3(cameraWidth, cameraHeight, 1.0f);
+            displayQuad.transform.position = mainCamera.transform.position + mainCamera.transform.forward * cameraDistance;
 
             // 現在の値を保存
             lastAspect = mainCamera.aspect;
@@ -280,6 +281,9 @@ public class PersonSilhouetteReceiver : MonoBehaviour
         {
             UpdateQuadTransform();
         }
+
+        //位置は常にカメラを追従
+        displayQuad.transform.position = mainCamera.transform.position + mainCamera.transform.forward * cameraDistance;
     }
 
     void ReconnectToPython()

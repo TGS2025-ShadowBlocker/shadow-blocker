@@ -3008,6 +3008,47 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   kick: 0
   punch: 0
+  landmarks:
+    left_wrist:
+      x: 0
+      y: 0
+      z: 0
+      visibility: 0
+    right_wrist:
+      x: 0
+      y: 0
+      z: 0
+      visibility: 0
+    left_ankle:
+      x: 0
+      y: 0
+      z: 0
+      visibility: 0
+    right_ankle:
+      x: 0
+      y: 0
+      z: 0
+      visibility: 0
+    left_shoulder:
+      x: 0
+      y: 0
+      z: 0
+      visibility: 0
+    right_shoulder:
+      x: 0
+      y: 0
+      z: 0
+      visibility: 0
+    left_hip:
+      x: 0
+      y: 0
+      z: 0
+      visibility: 0
+    right_hip:
+      x: 0
+      y: 0
+      z: 0
+      visibility: 0
 --- !u!4 &1397639230
 Transform:
   m_ObjectHideFlags: 0
@@ -4257,6 +4298,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 568961805302425224, guid: d8002dcc47a6c474baf1447d820b20da, type: 3}
+      propertyPath: m_Size.x
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 745216742782092003, guid: d8002dcc47a6c474baf1447d820b20da, type: 3}
       propertyPath: m_SortingOrder
       value: 10

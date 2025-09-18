@@ -14,6 +14,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float jumpPower;
     [SerializeField] private float kickknockbackPower;
     [SerializeField] private float punchknockbackPower;
+    [SerializeField] private float punch_cooldown;
+    [SerializeField] private float kick_cooldown;
 
     [Header("References")]
     [SerializeField] private GameObject goalResult;
@@ -51,8 +53,8 @@ public class PlayerController : MonoBehaviour
     {
         transform.position = startPosition;
         anim = GetComponent<Animator>();
-        Invoke("kickTrue", 1.5f);
-        Invoke("punchTrue", 1.5f);
+        Invoke("kickTrue", kick_cooldown);
+        Invoke("punchTrue", punch_cooldown);
     }
 
     private void FixedUpdate()
@@ -178,7 +180,7 @@ public class PlayerController : MonoBehaviour
         {
             knokback = new Vector2(-1.0f, 1.0f).normalized * kickknockbackPower;
             kickActiveTime = false;
-            Invoke("kickTrue",1.5f);
+            Invoke("kickTrue", kick_cooldown);
             ScoreCounter.Attack();
             knockback = true;
             Invoke("knokbackFalse", 0.2f);
@@ -187,7 +189,7 @@ public class PlayerController : MonoBehaviour
         {
             knokback = new Vector2(-1.0f, 1.0f / 200.0f).normalized * punchknockbackPower;
             punchActiveTime = false;
-            Invoke("punchTrue",1.5f);
+            Invoke("punchTrue", punch_cooldown);
             ScoreCounter.Attack();
             knockback = true;
             Invoke("knokbackFalse", 0.2f);
