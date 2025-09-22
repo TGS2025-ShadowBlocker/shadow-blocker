@@ -1,5 +1,6 @@
 using Newtonsoft.Json;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -15,9 +16,9 @@ public class GetTrackingDatas : MonoBehaviour
 
     private float requestInterval = 0.1f; // リクエストの感覚（秒）
 
-    public bool kick = false;
-    public bool punch = false;
-    public LandmarksData landmarks;
+    private bool kick = false;
+    private bool punch = false;
+    private Dictionary<string, LandmarkPoint> landmarks;
 
     private void Awake()
     {
@@ -75,7 +76,7 @@ public class GetTrackingDatas : MonoBehaviour
     // 他のスクリプトから値を取得するためのプロパティ
     public bool IsKickActive => kick;
     public bool IsPunchActive => punch;
-    public LandmarksData LandmarksData => landmarks;
+    public Dictionary<string, LandmarkPoint> LandmarksData => landmarks;
 }
 
 [System.Serializable]
@@ -87,7 +88,7 @@ public class LandmarkPoint
     public float visibility;
 }
 
-[System.Serializable]
+/*[System.Serializable]
 public class LandmarksData
 {
     public LandmarkPoint left_wrist;//手首
@@ -98,14 +99,14 @@ public class LandmarksData
     public LandmarkPoint right_shoulder;
     public LandmarkPoint left_hip;//腰
     public LandmarkPoint right_hip;
-}
+}*/
 
 [System.Serializable]
 public class CurrentActions
 {
     public bool kick;
     public bool punch;
-    public LandmarksData landmarks;
+    public Dictionary<string, LandmarkPoint> landmarks;
 }
 
 [System.Serializable]

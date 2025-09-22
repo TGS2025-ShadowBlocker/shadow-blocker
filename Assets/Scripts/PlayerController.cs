@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System.Collections.Generic;
 /***********************
 
 なんで変数名を何でもかんでも略そうとするの？
@@ -41,7 +42,7 @@ public class PlayerController : MonoBehaviour
 
     // Claude曰くこうすれば可読性が上がるらしい
     [Header("Consts")]
-    private const float VELOCITY_THRESHOLD = 0.0001f;
+    private const float VELOCITY_THRESHOLD = 0.1f;
     private const string GROUND_TAG = "ground";
     private const string GOAL_TAG = "goal";
     private const string DEATH_TAG = "death";
@@ -187,7 +188,7 @@ public class PlayerController : MonoBehaviour
         var tracker = GetTrackingDatas.Instance;
         if (tracker == null) return; // トラッキング用オブジェクトがシーンにない場合は何もしない
         //左手もしくは右手の近くにplayerがいる
-        if ((tracker.IsKickActive && kickActiveTime) && (PointDistance(tracker.landmarks.left_ankle) < kick_range || PointDistance(tracker.landmarks.right_ankle) < kick_range))
+        if ((tracker.IsKickActive && kickActiveTime) && (PointDistance(tracker.LandmarksData["left_ankle"]) < kick_range || PointDistance(tracker.LandmarksData["left_ankle"]) < kick_range))
         {
             knokback = new Vector2(-1.0f, 1.0f).normalized * kickknockbackPower;
             kickActiveTime = false;
@@ -196,7 +197,7 @@ public class PlayerController : MonoBehaviour
             knockback = true;
             Invoke("knokbackFalse", 0.2f);
         }
-        else if ((tracker.IsPunchActive && punchActiveTime) && (PointDistance(tracker.landmarks.left_wrist) < punch_range || PointDistance(tracker.landmarks.right_wrist) < punch_range))
+        else if ((tracker.IsPunchActive && punchActiveTime) && (PointDistance(tracker.LandmarksData["left_ankle"]) < punch_range || PointDistance(tracker.LandmarksData["left_ankle"]) < punch_range))
         {
             knokback = new Vector2(-1.0f, 1.0f / 200.0f).normalized * punchknockbackPower;
             punchActiveTime = false;
@@ -273,13 +274,12 @@ public class PlayerController : MonoBehaviour
         return Mathf.Abs(verticalVelocity) < VELOCITY_THRESHOLD;
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
+    private void OnCollisionStay2D(Collision2D collision)
     {
         string collisionTag = collision.gameObject.tag;
         if(collisionTag == GROUND_TAG && IsVerticalVelocityZero())
         {
             isGround = true;
-            anim.Play("boudati");
         }
         if (collisionTag == GOAL_TAG)
         {
