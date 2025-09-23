@@ -85,17 +85,18 @@ public class ShadowCollison : MonoBehaviour
         {
             float A_x = tracker.LandmarksData[landmark_names[bones_order[i].x]].x;
             float A_y = tracker.LandmarksData[landmark_names[bones_order[i].x]].y;
-            PointA = mainCamera.ViewportToWorldPoint(new Vector3(A_x, A_y, 0.0f));
+            PointA = mainCamera.ViewportToWorldPoint(new Vector3(A_x, 1.0f - A_y, 0.0f));
             float B_x = tracker.LandmarksData[landmark_names[bones_order[i].y]].x;
             float B_y = tracker.LandmarksData[landmark_names[bones_order[i].y]].y;
-            PointB = mainCamera.ViewportToWorldPoint(new Vector3(B_x, B_y, 0.0f));
+            PointB = mainCamera.ViewportToWorldPoint(new Vector3(B_x, 1.0f - B_y, 0.0f));
 
             bones[i].transform.position = (PointA + PointB) / 2;
             float distance = Vector2.Distance(PointA, PointB);
             Vector2 direction = PointB - PointA;
             float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
             bones[i].transform.rotation = Quaternion.Euler(0, 0, angle);
-            bones[i].GetComponent<BoxCollider2D>().size = new Vector2(distance, bone_Thickness);
+            bones[i].transform.localScale = new Vector2(distance, bone_Thickness);
+            bones[i].GetComponent<BoxCollider2D>().size = Vector2.one;
         }
     }
 }
