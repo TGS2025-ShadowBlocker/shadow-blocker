@@ -19,6 +19,7 @@ public class GetTrackingDatas : MonoBehaviour
     private bool kick = false;
     private bool punch = false;
     private Dictionary<string, LandmarkPoint> landmarks;
+    private Dictionary<string, LandmarkPoint> old_landmarks;
 
     private void Awake()
     {
@@ -56,6 +57,7 @@ public class GetTrackingDatas : MonoBehaviour
                 // Žæ“¾‚µ‚½’l‚ð•Ï”‚ÉŠi”[
                 kick = status.current_actions.kick;
                 punch = status.current_actions.punch;
+                old_landmarks = landmarks;
                 landmarks = status.current_actions.landmarks;
 
                 Debug.Log($"Kick: {kick}, Punch: {punch}");
@@ -77,6 +79,8 @@ public class GetTrackingDatas : MonoBehaviour
     public bool IsKickActive => kick;
     public bool IsPunchActive => punch;
     public Dictionary<string, LandmarkPoint> LandmarksData => landmarks;
+    public Dictionary<string, LandmarkPoint> Old_LandmarksData => old_landmarks;
+    public float RequestInterval => requestInterval;
 }
 
 [System.Serializable]

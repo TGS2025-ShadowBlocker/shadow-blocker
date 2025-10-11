@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.InputSystem;
 using System.Collections.Generic;
 /***********************
@@ -19,6 +20,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float kick_cooldown;
     [SerializeField] private float punch_range;
     [SerializeField] private float kick_range;
+    [SerializeField] private float Touch_power;
+    [SerializeField] private float hosi_time;
+    [SerializeField] private float petto_time;
 
     [Header("References")]
     [SerializeField] private GameObject goalResult;
@@ -27,6 +31,10 @@ public class PlayerController : MonoBehaviour
     public Vector3 startPosition;
     [SerializeField] private Animator anim;
     [SerializeField] private ScoreCounter ScoreCounter;
+    [SerializeField] private GameObject hosi_UI;
+    [SerializeField] private Image hosi_circle;
+    [SerializeField] private GameObject petto_UI;
+    [SerializeField] private Image petto_circle;
 
     [Header("State")]
     private bool isGround = true;
@@ -42,10 +50,15 @@ public class PlayerController : MonoBehaviour
 
     // Claude曰くこうすれば可読性が上がるらしい
     [Header("Consts")]
-    private const float VELOCITY_THRESHOLD = 0.1f;
+    private const float VELOCITY_THRESHOLD = 0.3f;
     private const string GROUND_TAG = "ground";
     private const string GOAL_TAG = "goal";
     private const string DEATH_TAG = "death";
+    private const string BONE_TAG = "bone";
+    private const string HOSI_TAG = "hosi";
+    private const string PETTO_TAG = "petto";
+    private int playerLayer => LayerMask.NameToLayer("player");
+    private int boneLayer => LayerMask.NameToLayer("bone");
     [SerializeField] private Camera mainCamera; 
 
     private void Awake()
@@ -68,34 +81,37 @@ public class PlayerController : MonoBehaviour
 
     private void Movement()
     {
-        // Velocityを初期化する
-        moveVelocity = Vector2.zero;
-        
-        // ゲームがアクティブな場合のみ移動処理を行う
-        if (GameManager.Instance.isGameActive)
+        if (!knockback)
         {
-            // 基本操作(左右移動とジャンプ)のVelocityを設定する
-            BasicMovement();
+            // Velocityを初期化する
+            moveVelocity = Vector2.zero;
 
-            // Velocityを適用する
-            ApplyMovement(moveVelocity);
+            // ゲームがアクティブな場合のみ移動処理を行う
+            if (GameManager.Instance.isGameActive)
+            {
+                // 基本操作(左右移動とジャンプ)のVelocityを設定する
+                BasicMovement();
 
-        }
-        else if(end_first)
-        {
-            //ゲーム終了後最初の1フレームは速度を0にする
-            ApplyMovement(Vector2.zero);
-            end_first = false;
-        }
+                // Velocityを適用する
+                ApplyMovement(moveVelocity);
+
+            }
+            else if (end_first)
+            {
+                //ゲーム終了後最初の1フレームは速度を0にする
+                ApplyMovement(Vector2.zero);
+                end_first = false;
+            }
 
             PlayAnim();
             //ゲームが終了した後も殴れるとおもろいので外に出します
             // ノックバックする
             Knockback();
 
-        if (!Input.GetKey(KeyCode.F) && !Input.GetKey(KeyCode.R) && !Input.GetKey(KeyCode.C))
-        {
-            canKnockback = true;
+            if (!Input.GetKey(KeyCode.F) && !Input.GetKey(KeyCode.R) && !Input.GetKey(KeyCode.C))
+            {
+                canKnockback = true;
+            }
         }
     }
     
@@ -195,7 +211,7 @@ public class PlayerController : MonoBehaviour
             Invoke("kickTrue", kick_cooldown);
             ScoreCounter.Attack();
             knockback = true;
-            Invoke("knokbackFalse", 0.2f);
+            rb.velocity = new Vector2(0.0f, 0.0f);
         }
         else if ((tracker.IsPunchActive && punchActiveTime) && (PointDistance(tracker.LandmarksData["left_ankle"]) < punch_range || PointDistance(tracker.LandmarksData["left_ankle"]) < punch_range))
         {
@@ -204,7 +220,7 @@ public class PlayerController : MonoBehaviour
             Invoke("punchTrue", punch_cooldown);
             ScoreCounter.Attack();
             knockback = true;
-            Invoke("knokbackFalse", 0.2f);
+            rb.velocity = new Vector2(0.0f, 0.0f);
         }
         rb.AddForce(knokback);
     }
@@ -266,7 +282,41 @@ public class PlayerController : MonoBehaviour
         GameManager.Instance.isGameActive = false;
         Debug.Log("goal");
     }
-    
+
+    private void Touch_Knokback(Collision2D collision)
+    {
+        rb.velocity = new Vector2(0.0f, 0.0f);
+        Collider2D otherCollider = collision.collider;
+        Vector2 contactPoint = collision.GetContact(0).point;
+
+        float angularVelocity = collision.gameObject.GetComponent<bone_info>().angularVelocity;
+        Vector2 velocity = collision.gameObject.GetComponent<bone_info>().velocity;
+
+        // 2. オブジェクトの中心（ピボット）から衝突点へのベクトルを計算
+        Vector2 pivot = transform.position;
+        Vector2 radiusVector = contactPoint - pivot;
+
+        // 3. 角速度をラジアン/秒に変換（物理計算で使うため）
+        float angularVelocityRad = angularVelocity * Mathf.Deg2Rad;
+
+        // 4. 回転によって生じる速度（接線速度）を計算
+        //    これは2D空間における角速度ベクトルと半径ベクトルのクロス積（外積）に相当します。
+        Vector2 tangentialVelocity = new Vector2(
+            -angularVelocityRad * radiusVector.y, // -ωz * ry
+             angularVelocityRad * radiusVector.x  //  ωz * rx
+        );
+
+        // 5. オブジェクト自体の移動速度（並進速度）と回転による接線速度を足し合わせる
+        Vector2 velocityAtContactPoint = velocity + tangentialVelocity;
+        velocityAtContactPoint *= Touch_power;
+        if(velocityAtContactPoint.magnitude > 10.0f)
+        {
+            knockback = true;
+            rb.AddForce(velocityAtContactPoint);
+        }
+
+    }
+
     // y軸の速度がほぼゼロかどうかを判定
     private bool IsVerticalVelocityZero()
     {
@@ -277,10 +327,70 @@ public class PlayerController : MonoBehaviour
     private void OnCollisionStay2D(Collision2D collision)
     {
         string collisionTag = collision.gameObject.tag;
-        if(collisionTag == GROUND_TAG && IsVerticalVelocityZero())
+        if((collisionTag == GROUND_TAG || collisionTag == BONE_TAG) && IsVerticalVelocityZero())
         {
             isGround = true;
         }
+        if((collisionTag == GROUND_TAG || collisionTag == BONE_TAG) && knockback)
+        {
+            Invoke("knokbackFalse", 0.2f);
+        }
+    }
+
+    private void hosi()
+    {
+        Physics2D.IgnoreLayerCollision(playerLayer, boneLayer, true);
+        Invoke("hosi_end", hosi_time);
+        StartCoroutine(WipeCircle(hosi_time,hosi_circle));
+        hosi_UI.SetActive(true);
+
+    }
+    private void petto()
+    {
+        jumpPower = 130.0f;
+        speed = 10.0f;
+        Invoke("petto_end", petto_time);
+        StartCoroutine(WipeCircle(petto_time,petto_circle));
+        petto_UI.SetActive(true);
+    }
+    private System.Collections.IEnumerator WipeCircle(float wipeDuration,Image circleImage)
+    {
+        float elapsedTime = 0f;
+
+        // wipeDuration秒かけて処理を行う
+        while (elapsedTime < wipeDuration)
+        {
+            // 経過時間から進行度（0から1）を計算
+            float progress = elapsedTime / wipeDuration;
+
+            // Fill Amountを 1 -> 0 に変化させる
+            circleImage.fillAmount = 1.0f - progress;
+
+            // 経過時間を更新
+            elapsedTime += Time.deltaTime;
+
+            // 1フレーム待つ
+            yield return null;
+        }
+
+        // 最後にきっちり0にする
+        circleImage.fillAmount = 0;
+    }
+    private void hosi_end()
+    {
+        Physics2D.IgnoreLayerCollision(playerLayer, boneLayer, false);
+        hosi_UI.SetActive(false);
+    }
+    private void petto_end()
+    {
+        jumpPower = 100.0f;
+        speed = 5.0f;
+        petto_UI.SetActive(false);
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        string collisionTag = collision.gameObject.tag;
         if (collisionTag == GOAL_TAG)
         {
             // ゴールしたときのUIを表示とゲームのアクティブ状態を変更
@@ -291,12 +401,25 @@ public class PlayerController : MonoBehaviour
             // プレイヤーの再生成と死んだプレイヤーの削除を行う
             Death();
         }
+        if(collisionTag == BONE_TAG)
+        {
+            Touch_Knokback(collision);
+        }
+        if(collisionTag == HOSI_TAG)
+        {
+            hosi();
+
+        }
+        if(collisionTag == PETTO_TAG)
+        {
+            petto();
+        }
     }
 
     private void OnCollisionExit2D(Collision2D collision)
     {
         string collisionTag = collision.gameObject.tag;
-        if(collisionTag == GROUND_TAG)
+        if(collisionTag == GROUND_TAG || collisionTag == BONE_TAG)
         {
             isGround = false;
         }
